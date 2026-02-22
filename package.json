@@ -1,23 +1,22 @@
 {
-  "name": "@quartz-community/plugin-template",
+  "name": "@quartz-community/note-properties",
   "version": "0.1.0",
-  "description": "Template repository for Quartz community plugins.",
+  "description": "Frontmatter processing and note properties display for Quartz",
   "type": "module",
   "license": "MIT",
   "author": "Quartz Community",
-  "homepage": "https://quartz.jzhao.xyz",
+  "homepage": "https://github.com/quartz-community/note-properties",
   "repository": {
     "type": "git",
-    "url": "https://github.com/quartz-community/plugin-template"
+    "url": "https://github.com/quartz-community/note-properties"
   },
   "keywords": [
     "quartz",
     "quartz-plugin",
-    "plugin-template",
-    "remark",
-    "rehype",
-    "mdast",
-    "hast"
+    "note-properties",
+    "frontmatter",
+    "transformer",
+    "component"
   ],
   "files": [
     "dist",
@@ -67,17 +66,16 @@
   },
   "dependencies": {
     "@quartz-community/types": "github:quartz-community/types",
-    "mdast-util-find-and-replace": "^3.0.1",
-    "rehype-slug": "^6.0.0",
-    "remark-gfm": "^4.0.1",
-    "remark-parse": "^11.0.0",
-    "remark-stringify": "^11.0.0",
+    "gray-matter": "^4.0.3",
+    "js-yaml": "^4.1.0",
+    "remark-frontmatter": "^5.0.0",
+    "toml": "^3.0.0",
     "unified": "^11.0.5",
-    "unist-util-visit": "^5.0.0",
     "vfile": "^6.0.3"
   },
   "devDependencies": {
     "@types/hast": "^3.0.4",
+    "@types/js-yaml": "^4.0.9",
     "@types/mdast": "^4.0.4",
     "@types/node": "^24.10.0",
     "@typescript-eslint/eslint-plugin": "^7.18.0",
@@ -90,26 +88,70 @@
     "typescript": "^5.9.3",
     "vitest": "^2.1.9"
   },
-  "quartz": {
-    "name": "plugin-template",
-    "displayName": "Plugin Template",
-    "category": "transformer",
-    "version": "1.0.0",
-    "quartzVersion": ">=5.0.0",
-    "dependencies": [],
-    "defaultOrder": 50,
-    "defaultEnabled": true,
-    "defaultOptions": {},
-    "components": {
-      "ExampleComponent": {
-        "displayName": "Example Component",
-        "defaultPosition": "right",
-        "defaultPriority": 50
-      }
-    }
-  },
   "engines": {
     "node": ">=22",
     "npm": ">=10.9.2"
+  },
+  "quartz": {
+    "name": "note-properties",
+    "displayName": "Note Properties",
+    "category": [
+      "transformer",
+      "component"
+    ],
+    "version": "1.0.0",
+    "quartzVersion": ">=5.0.0",
+    "dependencies": [],
+    "defaultOrder": 5,
+    "defaultEnabled": true,
+    "defaultOptions": {
+      "includeAll": false,
+      "includedProperties": [
+        "description",
+        "tags",
+        "aliases"
+      ],
+      "excludedProperties": [],
+      "hidePropertiesView": false,
+      "delimiters": "---",
+      "language": "yaml"
+    },
+    "optionSchema": {
+      "includeAll": {
+        "type": "boolean",
+        "description": "Include all frontmatter properties in the display"
+      },
+      "includedProperties": {
+        "type": "array",
+        "description": "Properties to include when includeAll is false"
+      },
+      "excludedProperties": {
+        "type": "array",
+        "description": "Properties to exclude from display"
+      },
+      "hidePropertiesView": {
+        "type": "boolean",
+        "description": "Hide the visual properties panel while still processing frontmatter"
+      },
+      "delimiters": {
+        "type": "string",
+        "description": "Frontmatter delimiters"
+      },
+      "language": {
+        "type": "enum",
+        "values": [
+          "yaml",
+          "toml"
+        ],
+        "description": "Frontmatter language"
+      }
+    },
+    "components": {
+      "NotePropertiesComponent": {
+        "displayName": "Note Properties",
+        "defaultPosition": "beforeBody",
+        "defaultPriority": 15
+      }
+    }
   }
 }
