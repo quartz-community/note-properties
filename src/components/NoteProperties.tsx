@@ -169,10 +169,19 @@ export default ((opts?: NotePropertiesComponentOptions) => {
 
   const Component: QuartzComponent = (props: QuartzComponentProps) => {
     const noteProps = props.fileData?.noteProperties as
-      | { properties: Record<string, unknown>; hideView: boolean }
+      | {
+          properties: Record<string, unknown>;
+          hideView: boolean;
+          showProperties?: boolean;
+          collapseProperties?: boolean;
+        }
       | undefined;
+    if (!noteProps) return null;
 
-    if (!noteProps || noteProps.hideView) return null;
+    // Per-note override takes precedence over global config
+    // showProperties: true = force show, false = force hide, undefined = follow hideView config
+    if (noteProps.showProperties === false) return null;
+    if (noteProps.showProperties !== true && noteProps.hideView) return null;
 
     const properties = noteProps.properties;
     const entries = Object.entries(properties);
@@ -182,11 +191,13 @@ export default ((opts?: NotePropertiesComponentOptions) => {
     const i18nData = i18n(locale);
     const ctx: RenderCtx = { slug: (props.fileData?.slug as string) ?? "" };
 
+    // Per-note collapse override takes precedence over component option
+    const isCollapsed = noteProps.collapseProperties ?? collapsed;
     return (
       <details
         class={classNames(props.displayClass, "note-properties")}
-        open={!collapsed}
-        data-collapsed={collapsed}
+        open={!isCollapsed}
+        data-collapsed={isCollapsed}
       >
         <summary class="note-properties-header">
           <span class="note-properties-title">{i18nData.components.noteProperties.title}</span>

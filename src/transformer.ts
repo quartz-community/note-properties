@@ -110,12 +110,33 @@ function extractLinksFromValue(value: unknown): string[] {
   return [];
 }
 
+/** Quartz-internal frontmatter keys that should never appear in the properties table. */
+const QUARTZ_INTERNAL_KEYS = new Set([
+  "quartz-properties",
+  "quartzProperties",
+  "quartz-properties-collapse",
+  "quartzPropertiesCollapse",
+]);
+
+function coerceToBool(value: unknown): boolean | undefined {
+  if (value === undefined || value === null) return undefined;
+  if (typeof value === "boolean") return value;
+  if (typeof value === "string") {
+    const lower = value.toLowerCase();
+    if (lower === "true") return true;
+    if (lower === "false") return false;
+  }
+  return undefined;
+}
 function getVisibleProperties(
   data: Record<string, unknown>,
   opts: NotePropertiesOptions,
 ): Record<string, unknown> {
   const excluded = new Set(opts.excludedProperties);
-
+  // Always exclude Quartz-internal keys from the visible properties table
+  for (const key of QUARTZ_INTERNAL_KEYS) {
+    excluded.add(key);
+  }
   if (opts.includeAll) {
     const result: Record<string, unknown> = {};
     for (const [key, value] of Object.entries(data)) {
@@ -212,10 +233,19 @@ export const NoteProperties: QuartzTransformerPlugin<Partial<NotePropertiesOptio
               file.data.frontmatterLinks = [...existingLinks, ...frontmatterLinks];
             }
 
+            // Read per-note overrides for properties view visibility and collapsed state
+            const showProperties = coerceToBool(
+              coalesceAliases(data, ["quartz-properties", "quartzProperties"]),
+            );
+            const collapseProperties = coerceToBool(
+              coalesceAliases(data, ["quartz-properties-collapse", "quartzPropertiesCollapse"]),
+            );
             const visibleProps = getVisibleProperties(data, opts);
             file.data.noteProperties = {
               properties: visibleProps,
               hideView: opts.hidePropertiesView,
+              showProperties,
+              collapseProperties,
             };
 
             file.data.frontmatter = data as QuartzPluginData["frontmatter"];
@@ -251,6 +281,10 @@ declare module "vfile" {
     noteProperties: {
       properties: Record<string, unknown>;
       hideView: boolean;
+      /** Per-note override: true = show, false = hide, undefined = follow config */
+      showProperties?: boolean;
+      /** Per-note override: true = collapsed, false = expanded, undefined = follow component option */
+      collapseProperties?: boolean;
     };
   }
 }
