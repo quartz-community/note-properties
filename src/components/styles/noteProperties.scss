@@ -102,30 +102,16 @@
     }
   }
 
-  .note-properties-list {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.25rem 0.5rem;
+  .note-properties-separator {
+    color: var(--gray);
+  }
 
-    li {
-      margin: 0;
-    }
+  .note-properties-list {
+    display: inline;
   }
 
   .note-properties-tags {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.25rem 0.5rem;
-
-    li {
-      margin: 0;
-    }
+    display: inline;
 
     .tag-link {
       display: inline-block;
@@ -144,22 +130,12 @@
   }
 
   .note-properties-object {
-    margin: 0;
-    display: grid;
-    grid-template-columns: auto 1fr;
-    gap: 0.15rem 0.5rem;
-
-    dt {
-      color: var(--gray);
+    code {
       font-size: 0.85em;
-
-      &::after {
-        content: ":";
-      }
-    }
-
-    dd {
-      margin: 0;
+      padding: 0.1rem 0.3rem;
+      border-radius: 3px;
+      background: var(--highlight);
+      word-break: break-all;
     }
   }
 }

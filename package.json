@@ -66,6 +66,7 @@
   },
   "dependencies": {
     "@quartz-community/types": "github:quartz-community/types",
+    "@quartz-community/utils": "github:quartz-community/utils",
     "gray-matter": "^4.0.3",
     "js-yaml": "^4.1.0",
     "remark-frontmatter": "^5.0.0",

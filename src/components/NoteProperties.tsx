@@ -4,17 +4,106 @@ import type {
   QuartzComponentConstructor,
 } from "@quartz-community/types";
 import { classNames } from "../util/lang";
+import { resolveRelative } from "../util/path";
 import { i18n } from "../i18n";
 import style from "./styles/noteProperties.scss";
 // @ts-ignore
 import script from "./scripts/noteProperties.inline.ts";
 
 export interface NotePropertiesComponentOptions {
-  /** Collapse the properties panel by default */
   collapsed?: boolean;
 }
 
-function renderValue(value: unknown): preact.JSX.Element | string {
+const WIKILINK_RE = /\[\[([^\]|]+)(?:\|([^\]]+))?\]\]/g;
+const MDLINK_RE = /\[([^\]]*)\]\(([^)]+)\)/g;
+const URL_RE = /https?:\/\/[^\s<>]+/g;
+
+type RenderCtx = { slug: string };
+
+function renderTextWithLinks(text: string, ctx: RenderCtx): (preact.JSX.Element | string)[] {
+  const segments: { start: number; end: number; node: preact.JSX.Element }[] = [];
+  for (const match of text.matchAll(WIKILINK_RE)) {
+    const target = match[1]!;
+    const display = match[2] ?? target;
+    const href = resolveRelative(ctx.slug, target);
+    segments.push({
+      start: match.index,
+      end: match.index + match[0].length,
+      node: (
+        <a href={href} class="internal note-properties-link">
+          {display}
+        </a>
+      ),
+    });
+  }
+
+  for (const match of text.matchAll(MDLINK_RE)) {
+    const overlaps = segments.some(
+      (s) => match.index < s.end && match.index + match[0].length > s.start,
+    );
+    if (overlaps) continue;
+    const display = match[1]!;
+    const href = match[2]!;
+    const isExternal = href.startsWith("http://") || href.startsWith("https://");
+    const resolvedHref = isExternal ? href : resolveRelative(ctx.slug, href);
+    segments.push({
+      start: match.index,
+      end: match.index + match[0].length,
+      node: (
+        <a
+          href={resolvedHref}
+          class={classNames(isExternal ? "external" : "internal", "note-properties-link")}
+          {...(isExternal ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+        >
+          {display || href}
+        </a>
+      ),
+    });
+  }
+
+  for (const match of text.matchAll(URL_RE)) {
+    const overlaps = segments.some(
+      (s) => match.index < s.end && match.index + match[0].length > s.start,
+    );
+    if (overlaps) continue;
+
+    segments.push({
+      start: match.index,
+      end: match.index + match[0].length,
+      node: (
+        <a
+          href={match[0]}
+          class="external note-properties-link"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          {match[0]}
+        </a>
+      ),
+    });
+  }
+
+  if (segments.length === 0) return [text];
+
+  segments.sort((a, b) => a.start - b.start);
+
+  const result: (preact.JSX.Element | string)[] = [];
+  let cursor = 0;
+  for (const seg of segments) {
+    if (seg.start > cursor) {
+      result.push(text.slice(cursor, seg.start));
+    }
+    result.push(seg.node);
+    cursor = seg.end;
+  }
+  if (cursor < text.length) {
+    result.push(text.slice(cursor));
+  }
+
+  return result;
+}
+
+function renderValue(value: unknown, ctx: RenderCtx): preact.JSX.Element | string {
   if (value === null || value === undefined) {
     return <span class="note-properties-empty">—</span>;
   }
@@ -32,91 +121,47 @@ function renderValue(value: unknown): preact.JSX.Element | string {
   }
 
   if (typeof value === "string") {
-    // Check for wikilinks
-    const wikilinkMatch = value.match(/^\[\[([^\]|]+)(?:\|([^\]]+))?\]\]$/);
-    if (wikilinkMatch) {
-      const target = wikilinkMatch[1];
-      const display = wikilinkMatch[2] ?? target;
-      return (
-        <a href={target} class="internal note-properties-link">
-          {display}
-        </a>
-      );
-    }
-
-    // Check for markdown links
-    const mdLinkMatch = value.match(/^\[([^\]]*)\]\(([^)]+)\)$/);
-    if (mdLinkMatch) {
-      const display = mdLinkMatch[1]!;
-      const href = mdLinkMatch[2]!;
-      const isExternal = href.startsWith("http://") || href.startsWith("https://");
-      return (
-        <a
-          href={href}
-          class={classNames(isExternal ? "external" : "internal", "note-properties-link")}
-          {...(isExternal ? { target: "_blank", rel: "noopener noreferrer" } : {})}
-        >
-          {display || href}
-        </a>
-      );
-    }
-
-    // Check for URLs
-    if (value.startsWith("http://") || value.startsWith("https://")) {
-      return (
-        <a
-          href={value}
-          class="external note-properties-link"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          {value}
-        </a>
-      );
-    }
-
-    return <span class="note-properties-text">{value}</span>;
+    const parts = renderTextWithLinks(value, ctx);
+    return <span class="note-properties-text">{parts}</span>;
   }
 
   if (Array.isArray(value)) {
-    return (
-      <ul class="note-properties-list">
-        {value.map((item, idx) => (
-          <li key={idx}>{renderValue(item)}</li>
-        ))}
-      </ul>
-    );
+    const items = value.map((item, idx) => {
+      const rendered = renderValue(item, ctx);
+      return (
+        <>
+          {idx > 0 && <span class="note-properties-separator">, </span>}
+          {rendered}
+        </>
+      );
+    });
+    return <span class="note-properties-list">{items}</span>;
   }
 
   if (typeof value === "object") {
-    const entries = Object.entries(value as Record<string, unknown>);
     return (
-      <dl class="note-properties-object">
-        {entries.map(([k, v]) => (
-          <>
-            <dt>{k}</dt>
-            <dd>{renderValue(v)}</dd>
-          </>
-        ))}
-      </dl>
+      <span class="note-properties-object">
+        <code>{JSON.stringify(value)}</code>
+      </span>
     );
   }
 
   return String(value);
 }
 
-function renderTagList(tags: string[]): preact.JSX.Element {
-  return (
-    <ul class="note-properties-tags">
-      {tags.map((tag) => (
-        <li key={tag}>
-          <a href={`/tags/${tag}`} class="internal tag-link">
-            #{tag}
-          </a>
-        </li>
-      ))}
-    </ul>
-  );
+function renderTagList(tags: string[], ctx: RenderCtx): preact.JSX.Element {
+  const items = tags.map((tag, idx) => {
+    const href = resolveRelative(ctx.slug, `tags/${tag}`);
+    return (
+      <>
+        {idx > 0 && <span class="note-properties-separator">, </span>}
+        <a href={href} class="internal tag-link">
+          #{tag}
+        </a>
+      </>
+    );
+  });
+  return <span class="note-properties-tags">{items}</span>;
 }
 
 export default ((opts?: NotePropertiesComponentOptions) => {
@@ -135,6 +180,7 @@ export default ((opts?: NotePropertiesComponentOptions) => {
 
     const locale = props.cfg?.locale || "en-US";
     const i18nData = i18n(locale);
+    const ctx: RenderCtx = { slug: (props.fileData?.slug as string) ?? "" };
 
     return (
       <details
@@ -153,8 +199,8 @@ export default ((opts?: NotePropertiesComponentOptions) => {
                 <td class="note-properties-key">{key}</td>
                 <td class="note-properties-value">
                   {key === "tags" && Array.isArray(value)
-                    ? renderTagList(value as string[])
-                    : renderValue(value)}
+                    ? renderTagList(value as string[], ctx)
+                    : renderValue(value, ctx)}
                 </td>
               </tr>
             ))}
