@@ -156,7 +156,7 @@ function renderTagList(tags: string[], ctx: RenderCtx): preact.JSX.Element {
       <>
         {idx > 0 && <span class="note-properties-separator">, </span>}
         <a href={href} class="internal tag-link">
-          #{tag}
+          {tag}
         </a>
       </>
     );
