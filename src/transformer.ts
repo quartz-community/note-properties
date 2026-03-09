@@ -2,7 +2,6 @@ import matter from "gray-matter";
 import remarkFrontmatter from "remark-frontmatter";
 import yaml from "js-yaml";
 import toml from "toml";
-import type { PluggableList } from "unified";
 import type {
   QuartzTransformerPlugin,
   BuildCtx,
@@ -162,8 +161,8 @@ export const NoteProperties: QuartzTransformerPlugin<Partial<NotePropertiesOptio
   const opts = { ...defaultOptions, ...userOpts };
   return {
     name: "NoteProperties",
-    markdownPlugins(ctx: BuildCtx) {
-      const { cfg, allSlugs } = ctx;
+    markdownPlugins(_ctx: BuildCtx) {
+      const { allSlugs } = _ctx;
       return [
         [remarkFrontmatter, ["yaml", "toml"]],
         () => {

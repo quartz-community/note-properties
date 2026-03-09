@@ -1,9 +1,7 @@
-// @ts-nocheck
-
 const STORAGE_KEY = "note-properties-collapsed";
 
 function init() {
-  const details = document.querySelector("details.note-properties");
+  const details = document.querySelector<HTMLDetailsElement>("details.note-properties");
   if (!details) return;
 
   const saved = localStorage.getItem(STORAGE_KEY);
@@ -12,9 +10,9 @@ function init() {
     details.open = !isCollapsed;
   }
 
-  function toggleHandler() {
+  const toggleHandler = () => {
     localStorage.setItem(STORAGE_KEY, String(!details.open));
-  }
+  };
 
   details.addEventListener("toggle", toggleHandler);
 

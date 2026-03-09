@@ -7,7 +7,7 @@ import { classNames } from "../util/lang";
 import { resolveRelative } from "../util/path";
 import { i18n } from "../i18n";
 import style from "./styles/noteProperties.scss";
-// @ts-ignore
+// @ts-expect-error - inline script import handled by Quartz bundler
 import script from "./scripts/noteProperties.inline.ts";
 
 export interface NotePropertiesComponentOptions {
