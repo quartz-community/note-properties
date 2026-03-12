@@ -26,3 +26,6 @@ function init() {
 document.addEventListener("nav", () => {
   init();
 });
+document.addEventListener("render", () => {
+  init();
+});
