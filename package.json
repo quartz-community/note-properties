@@ -54,7 +54,13 @@
   },
   "peerDependencies": {
     "@jackyzha0/quartz": "^4.5.2",
-    "preact": "^10.0.0"
+    "preact": "^10.0.0",
+    "gray-matter": "^4.0.3",
+    "js-yaml": "^4.1.0",
+    "remark-frontmatter": "^5.0.0",
+    "toml": "^3.0.0",
+    "unified": "^11.0.5",
+    "vfile": "^6.0.3"
   },
   "peerDependenciesMeta": {
     "@jackyzha0/quartz": {
@@ -62,19 +68,29 @@
     },
     "preact": {
       "optional": false
+    },
+    "gray-matter": {
+      "optional": true
+    },
+    "js-yaml": {
+      "optional": true
+    },
+    "remark-frontmatter": {
+      "optional": true
+    },
+    "toml": {
+      "optional": true
+    },
+    "unified": {
+      "optional": true
+    },
+    "vfile": {
+      "optional": true
     }
   },
   "dependencies": {
     "@quartz-community/types": "github:quartz-community/types",
-    "@quartz-community/utils": "github:quartz-community/utils",
-    "gray-matter": "^4.0.3",
-    "js-yaml": "^4.1.0",
-    "remark-frontmatter": "^5.0.0",
-    "toml": "^3.0.0",
-    "tsup": "^8.5.0",
-    "typescript": "^5.9.3",
-    "unified": "^11.0.5",
-    "vfile": "^6.0.3"
+    "@quartz-community/utils": "github:quartz-community/utils"
   },
   "devDependencies": {
     "@types/hast": "^3.0.4",
@@ -88,7 +104,9 @@
     "preact": "^10.28.2",
     "prettier": "^3.6.2",
     "sass": "^1.97.3",
-    "vitest": "^2.1.9"
+    "vitest": "^2.1.9",
+    "tsup": "^8.5.0",
+    "typescript": "^5.9.3"
   },
   "engines": {
     "node": ">=22",
