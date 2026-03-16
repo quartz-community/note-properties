@@ -53,9 +53,9 @@
   },
   "peerDependencies": {
     "@jackyzha0/quartz": "^4.5.2",
-    "preact": "^10.0.0",
     "gray-matter": "^4.0.3",
     "js-yaml": "^4.1.0",
+    "preact": "^10.0.0",
     "remark-frontmatter": "^5.0.0",
     "toml": "^3.0.0",
     "unified": "^11.0.5",
