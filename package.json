@@ -53,12 +53,7 @@
   },
   "peerDependencies": {
     "@jackyzha0/quartz": "^4.5.2",
-    "gray-matter": "^4.0.3",
-    "js-yaml": "^4.1.0",
     "preact": "^10.0.0",
-    "remark-frontmatter": "^5.0.0",
-    "toml": "^3.0.0",
-    "unified": "^11.0.5",
     "vfile": "^6.0.3"
   },
   "peerDependenciesMeta": {
@@ -67,21 +62,6 @@
     },
     "preact": {
       "optional": false
-    },
-    "gray-matter": {
-      "optional": true
-    },
-    "js-yaml": {
-      "optional": true
-    },
-    "remark-frontmatter": {
-      "optional": true
-    },
-    "toml": {
-      "optional": true
-    },
-    "unified": {
-      "optional": true
     },
     "vfile": {
       "optional": true
@@ -101,7 +81,9 @@
     "eslint": "^8.57.0",
     "eslint-config-prettier": "^9.1.0",
     "github-slugger": "^2.0.0",
+    "gray-matter": "^4.0.3",
     "hast-util-to-jsx-runtime": "^2.3.6",
+    "js-yaml": "^4.1.0",
     "preact": "^10.28.2",
     "prettier": "^3.6.2",
     "remark-frontmatter": "^5.0.0",
@@ -109,6 +91,7 @@
     "toml": "^3.0.0",
     "tsup": "^8.5.0",
     "typescript": "^5.9.3",
+    "unified": "^11.0.5",
     "vitest": "^2.1.9"
   },
   "engines": {
