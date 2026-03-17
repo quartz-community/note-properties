@@ -1,5 +1,8 @@
+import { createRequire } from 'module';
 import { joinSegments, simplifySlug as simplifySlug$1 } from '@quartz-community/utils';
 import { jsxs, jsx, Fragment } from 'preact/jsx-runtime';
+
+createRequire(import.meta.url);
 
 // src/util/lang.ts
 function classNames(...classes) {

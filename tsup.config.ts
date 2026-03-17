@@ -85,6 +85,10 @@ export default defineConfig({
   target: "es2022",
   splitting: false,
   outDir: "dist",
+  platform: "node",
+  banner: {
+    js: 'import { createRequire } from "module"; const require = createRequire(import.meta.url);',
+  },
   esbuildOptions(options) {
     options.jsx = "automatic";
     options.jsxImportSource = "preact";
