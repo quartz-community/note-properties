@@ -258,24 +258,6 @@ export const NoteProperties: QuartzTransformerPlugin<Partial<NotePropertiesOptio
 declare module "vfile" {
   interface DataMap {
     aliases: FullSlug[];
-    frontmatter: { [key: string]: unknown } & {
-      title: string;
-    } & Partial<{
-        tags: string[];
-        aliases: string[];
-        modified: string;
-        created: string;
-        published: string;
-        description: string;
-        socialDescription: string;
-        publish: boolean | string;
-        draft: boolean | string;
-        lang: string;
-        enableToc: string;
-        cssclasses: string[];
-        socialImage: string;
-        comments: boolean | string;
-      }>;
     frontmatterLinks: string[];
     noteProperties: {
       properties: Record<string, unknown>;
