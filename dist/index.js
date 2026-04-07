@@ -1,4 +1,5 @@
 import { createRequire } from 'module';
+import { classNames } from '@quartz-community/utils/lang';
 import { joinSegments, simplifySlug as simplifySlug$1 } from '@quartz-community/utils';
 import { jsxs, jsx, Fragment } from 'preact/jsx-runtime';
 
@@ -10289,7 +10290,7 @@ function coerceToArray(input) {
 }
 function slugTag(tag) {
   return tag.split("/").map(
-    (segment) => segment.replace(/\s+/g, "-").replace(/[^\w\p{L}\p{M}\p{N}/-]/gu, "").toLowerCase()
+    (segment) => segment.replace(/\s+/g, "-").replace(/[^\w\p{L}\p{M}\p{N}\p{Extended_Pictographic}/-]/gu, "").toLowerCase()
   ).join("/");
 }
 function getFileExtension(fp) {
@@ -10453,11 +10454,6 @@ var NoteProperties = (userOpts) => {
     }
   };
 };
-
-// src/util/lang.ts
-function classNames(...classes) {
-  return classes.filter(Boolean).join(" ");
-}
 function simplifySlug(fp) {
   return simplifySlug$1(fp);
 }

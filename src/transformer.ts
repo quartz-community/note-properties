@@ -46,7 +46,7 @@ function slugTag(tag: string): string {
     .map((segment) =>
       segment
         .replace(/\s+/g, "-")
-        .replace(/[^\w\p{L}\p{M}\p{N}/-]/gu, "")
+        .replace(/[^\w\p{L}\p{M}\p{N}\p{Extended_Pictographic}/-]/gu, "")
         .toLowerCase(),
     )
     .join("/");
