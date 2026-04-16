@@ -9,6 +9,8 @@ import type {
   FullSlug,
   FilePath,
 } from "@quartz-community/types";
+import { slugTag, slugifyFilePath, getFileExtension } from "@quartz-community/utils";
+import { slugifyWikilinkTarget } from "./util/path";
 import type { NotePropertiesOptions } from "./types";
 
 const defaultOptions: NotePropertiesOptions = {
@@ -40,44 +42,15 @@ function coerceToArray(input: unknown): string[] | undefined {
     .map((v: string | number) => v.toString());
 }
 
-function slugTag(tag: string): string {
-  return tag
-    .split("/")
-    .map((segment) =>
-      segment
-        .replace(/\s+/g, "-")
-        .replace(/[^\w\p{L}\p{M}\p{N}\p{Extended_Pictographic}/-]/gu, "")
-        .toLowerCase(),
-    )
-    .join("/");
-}
-
-function getFileExtension(fp: string): string {
-  return fp.split(".").pop() ?? "";
-}
-
-function slugifyFilePath(fp: string): FullSlug {
-  fp = fp.replace(/\\/g, "/");
-  fp = fp.replace(/\.md$/, "");
-  let slug = fp
-    .split("/")
-    .map((segment) => segment.replace(/\s+/g, "-").replace(/[^\w\p{L}\p{M}\p{N}/-]/gu, ""))
-    .join("/");
-  slug = slug.replace(/\/$/, "");
-  return slug as FullSlug;
-}
-
 function getAliasSlugs(aliases: string[]): FullSlug[] {
   return aliases.map((alias) => {
-    const isMd = getFileExtension(alias) === "md";
+    const isMd = getFileExtension(alias) === ".md";
     const mockFp = isMd ? alias : alias + ".md";
     return slugifyFilePath(mockFp as FilePath);
   });
 }
 
-// Wikilink pattern: [[target|display]] or [[target]]
 const WIKILINK_PATTERN = /\[\[([^\]|]+)(?:\|[^\]]+)?\]\]/g;
-// Markdown link pattern: [text](target)
 const MDLINK_PATTERN = /\[(?:[^\]]*)\]\(([^)]+)\)/g;
 
 function extractLinksFromValue(value: unknown): string[] {
@@ -87,7 +60,7 @@ function extractLinksFromValue(value: unknown): string[] {
 
     WIKILINK_PATTERN.lastIndex = 0;
     while ((match = WIKILINK_PATTERN.exec(value)) !== null) {
-      links.push(match[1]!);
+      links.push(slugifyWikilinkTarget(match[1]!));
     }
 
     MDLINK_PATTERN.lastIndex = 0;

@@ -1,6 +1,6 @@
 import { createRequire } from 'module';
 import { classNames } from '@quartz-community/utils/lang';
-import { joinSegments, simplifySlug as simplifySlug$1 } from '@quartz-community/utils';
+import { joinSegments, simplifySlug as simplifySlug$1, splitAnchor, slugifyFilePath } from '@quartz-community/utils';
 import { jsxs, jsx, Fragment } from 'preact/jsx-runtime';
 
 createRequire(import.meta.url);
@@ -11,6 +11,13 @@ function resolveRelative(current, target) {
   const simplified = simplifySlug(target);
   const rootPath = pathToRoot(current);
   return joinSegments(rootPath, simplified);
+}
+function slugifyWikilinkTarget(target) {
+  const [rawPath, anchor] = splitAnchor(target);
+  if (!rawPath) return anchor;
+  const pathWithExt = rawPath.endsWith(".md") ? rawPath : `${rawPath}.md`;
+  const slug = slugifyFilePath(pathWithExt);
+  return slug + anchor;
 }
 function pathToRoot(slug) {
   let rootPath = slug.split("/").filter((x) => x !== "").slice(0, -1).map((_) => "..").join("/");
@@ -50,7 +57,7 @@ function renderTextWithLinks(text, ctx) {
   for (const match of text.matchAll(WIKILINK_RE)) {
     const target = match[1];
     const display = match[2] ?? target;
-    const href = resolveRelative(ctx.slug, target);
+    const href = resolveRelative(ctx.slug, slugifyWikilinkTarget(target));
     segments.push({
       start: match.index,
       end: match.index + match[0].length,

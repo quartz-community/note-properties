@@ -32,15 +32,15 @@ describe("slugTag", () => {
     expect(runWithTag("my tag")).toEqual(["my-tag"]);
   });
 
-  it("strips special characters", () => {
-    expect(runWithTag("tag?#&")).toEqual(["tag"]);
+  it("replaces '&' with '-and-' and strips '?' and '#'", () => {
+    expect(runWithTag("tag?#&")).toEqual(["tag-and-"]);
   });
 
   it("keeps nested tag separators", () => {
     expect(runWithTag("parent/child")).toEqual(["parent/child"]);
   });
 
-  it("lowercases tags", () => {
+  it("lowercases tags (Obsidian-parity case-insensitive tag matching)", () => {
     expect(runWithTag("MyTag")).toEqual(["mytag"]);
   });
 

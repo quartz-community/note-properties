@@ -4,7 +4,7 @@ import type {
   QuartzComponentConstructor,
 } from "@quartz-community/types";
 import { classNames } from "../util/lang";
-import { resolveRelative } from "../util/path";
+import { resolveRelative, slugifyWikilinkTarget } from "../util/path";
 import { i18n } from "../i18n";
 import style from "./styles/noteProperties.scss";
 // @ts-expect-error - inline script import handled by Quartz bundler
@@ -25,7 +25,7 @@ function renderTextWithLinks(text: string, ctx: RenderCtx): (preact.JSX.Element 
   for (const match of text.matchAll(WIKILINK_RE)) {
     const target = match[1]!;
     const display = match[2] ?? target;
-    const href = resolveRelative(ctx.slug, target);
+    const href = resolveRelative(ctx.slug, slugifyWikilinkTarget(target));
     segments.push({
       start: match.index,
       end: match.index + match[0].length,

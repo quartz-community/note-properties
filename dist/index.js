@@ -1,6 +1,6 @@
 import { createRequire } from 'module';
+import { slugTag, getFileExtension, slugifyFilePath, splitAnchor, joinSegments, simplifySlug as simplifySlug$1 } from '@quartz-community/utils';
 import { classNames } from '@quartz-community/utils/lang';
-import { joinSegments, simplifySlug as simplifySlug$1 } from '@quartz-community/utils';
 import { jsxs, jsx, Fragment } from 'preact/jsx-runtime';
 
 const require$1 = createRequire(import.meta.url);
@@ -10268,6 +10268,30 @@ var jsYaml = {
 
 // src/transformer.ts
 var import_toml = __toESM(require_toml());
+function simplifySlug(fp) {
+  return simplifySlug$1(fp);
+}
+function resolveRelative(current, target) {
+  const simplified = simplifySlug(target);
+  const rootPath = pathToRoot(current);
+  return joinSegments(rootPath, simplified);
+}
+function slugifyWikilinkTarget(target) {
+  const [rawPath, anchor] = splitAnchor(target);
+  if (!rawPath) return anchor;
+  const pathWithExt = rawPath.endsWith(".md") ? rawPath : `${rawPath}.md`;
+  const slug = slugifyFilePath(pathWithExt);
+  return slug + anchor;
+}
+function pathToRoot(slug) {
+  let rootPath = slug.split("/").filter((x) => x !== "").slice(0, -1).map((_) => "..").join("/");
+  if (rootPath.length === 0) {
+    rootPath = ".";
+  }
+  return rootPath;
+}
+
+// src/transformer.ts
 var defaultOptions = {
   includeAll: false,
   includedProperties: ["description", "tags", "aliases"],
@@ -10288,24 +10312,9 @@ function coerceToArray(input) {
   }
   return input.filter((v) => typeof v === "string" || typeof v === "number").map((v) => v.toString());
 }
-function slugTag(tag) {
-  return tag.split("/").map(
-    (segment) => segment.replace(/\s+/g, "-").replace(/[^\w\p{L}\p{M}\p{N}\p{Extended_Pictographic}/-]/gu, "").toLowerCase()
-  ).join("/");
-}
-function getFileExtension(fp) {
-  return fp.split(".").pop() ?? "";
-}
-function slugifyFilePath(fp) {
-  fp = fp.replace(/\\/g, "/");
-  fp = fp.replace(/\.md$/, "");
-  let slug = fp.split("/").map((segment) => segment.replace(/\s+/g, "-").replace(/[^\w\p{L}\p{M}\p{N}/-]/gu, "")).join("/");
-  slug = slug.replace(/\/$/, "");
-  return slug;
-}
 function getAliasSlugs(aliases) {
   return aliases.map((alias) => {
-    const isMd = getFileExtension(alias) === "md";
+    const isMd = getFileExtension(alias) === ".md";
     const mockFp = isMd ? alias : alias + ".md";
     return slugifyFilePath(mockFp);
   });
@@ -10318,7 +10327,7 @@ function extractLinksFromValue(value2) {
     let match;
     WIKILINK_PATTERN.lastIndex = 0;
     while ((match = WIKILINK_PATTERN.exec(value2)) !== null) {
-      links.push(match[1]);
+      links.push(slugifyWikilinkTarget(match[1]));
     }
     MDLINK_PATTERN.lastIndex = 0;
     while ((match = MDLINK_PATTERN.exec(value2)) !== null) {
@@ -10454,21 +10463,6 @@ var NoteProperties = (userOpts) => {
     }
   };
 };
-function simplifySlug(fp) {
-  return simplifySlug$1(fp);
-}
-function resolveRelative(current, target) {
-  const simplified = simplifySlug(target);
-  const rootPath = pathToRoot(current);
-  return joinSegments(rootPath, simplified);
-}
-function pathToRoot(slug) {
-  let rootPath = slug.split("/").filter((x) => x !== "").slice(0, -1).map((_) => "..").join("/");
-  if (rootPath.length === 0) {
-    rootPath = ".";
-  }
-  return rootPath;
-}
 
 // src/i18n/locales/en-US.ts
 var en_US_default = {
@@ -10500,7 +10494,7 @@ function renderTextWithLinks(text, ctx) {
   for (const match of text.matchAll(WIKILINK_RE)) {
     const target = match[1];
     const display = match[2] ?? target;
-    const href = resolveRelative(ctx.slug, target);
+    const href = resolveRelative(ctx.slug, slugifyWikilinkTarget(target));
     segments.push({
       start: match.index,
       end: match.index + match[0].length,
