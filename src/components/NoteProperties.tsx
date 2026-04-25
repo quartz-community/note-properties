@@ -195,7 +195,7 @@ export default ((opts?: NotePropertiesComponentOptions) => {
     const isCollapsed = noteProps.collapseProperties ?? collapsed;
     return (
       <details
-        class={classNames(props.displayClass, "note-properties")}
+        class={classNames(props.displayClass, "note-properties", "metadata-container")}
         open={!isCollapsed}
         data-collapsed={isCollapsed}
       >
@@ -206,9 +206,9 @@ export default ((opts?: NotePropertiesComponentOptions) => {
         <table class="note-properties-table">
           <tbody>
             {entries.map(([key, value]) => (
-              <tr key={key} class="note-properties-row">
-                <td class="note-properties-key">{key}</td>
-                <td class="note-properties-value">
+              <tr key={key} class="note-properties-row metadata-property">
+                <td class="note-properties-key metadata-property-key">{key}</td>
+                <td class="note-properties-value metadata-property-value">
                   {key === "tags" && Array.isArray(value)
                     ? renderTagList(value as string[], ctx)
                     : renderValue(value, ctx)}

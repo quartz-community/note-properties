@@ -179,7 +179,7 @@ var NoteProperties_default = ((opts) => {
     return /* @__PURE__ */ jsxs(
       "details",
       {
-        class: classNames(props.displayClass, "note-properties"),
+        class: classNames(props.displayClass, "note-properties", "metadata-container"),
         open: !isCollapsed,
         "data-collapsed": isCollapsed,
         children: [
@@ -187,9 +187,9 @@ var NoteProperties_default = ((opts) => {
             /* @__PURE__ */ jsx("span", { class: "note-properties-title", children: i18nData.components.noteProperties.title }),
             /* @__PURE__ */ jsx("span", { class: "note-properties-count", children: entries.length })
           ] }),
-          /* @__PURE__ */ jsx("table", { class: "note-properties-table", children: /* @__PURE__ */ jsx("tbody", { children: entries.map(([key, value]) => /* @__PURE__ */ jsxs("tr", { class: "note-properties-row", children: [
-            /* @__PURE__ */ jsx("td", { class: "note-properties-key", children: key }),
-            /* @__PURE__ */ jsx("td", { class: "note-properties-value", children: key === "tags" && Array.isArray(value) ? renderTagList(value, ctx) : renderValue(value, ctx) })
+          /* @__PURE__ */ jsx("table", { class: "note-properties-table", children: /* @__PURE__ */ jsx("tbody", { children: entries.map(([key, value]) => /* @__PURE__ */ jsxs("tr", { class: "note-properties-row metadata-property", children: [
+            /* @__PURE__ */ jsx("td", { class: "note-properties-key metadata-property-key", children: key }),
+            /* @__PURE__ */ jsx("td", { class: "note-properties-value metadata-property-value", children: key === "tags" && Array.isArray(value) ? renderTagList(value, ctx) : renderValue(value, ctx) })
           ] }, key)) }) })
         ]
       }
