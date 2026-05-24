@@ -9,6 +9,8 @@ interface NotePropertiesOptions {
     excludedProperties: string[];
     /** Hide the visual properties panel while still processing frontmatter and resolving links. */
     hidePropertiesView: boolean;
+    /** Omit properties whose value is null, undefined, empty string, or empty array. */
+    hideEmptyProperties: boolean;
     /** Frontmatter delimiters. Defaults to "---". */
     delimiters: string | [string, string];
     /** Frontmatter language. Defaults to "yaml". */

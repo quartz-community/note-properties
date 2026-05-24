@@ -10476,6 +10476,7 @@ var defaultOptions = {
   includedProperties: ["description", "tags", "aliases"],
   excludedProperties: [],
   hidePropertiesView: false,
+  hideEmptyProperties: false,
   delimiters: "---",
   language: "yaml"
 };
@@ -10561,6 +10562,12 @@ function coerceToBool(value2) {
   }
   return void 0;
 }
+function isEmpty(value2) {
+  if (value2 === null || value2 === void 0) return true;
+  if (typeof value2 === "string" && value2.trim() === "") return true;
+  if (Array.isArray(value2) && value2.length === 0) return true;
+  return false;
+}
 function getVisibleProperties(data, opts) {
   const excluded = new Set(opts.excludedProperties);
   for (const key of QUARTZ_INTERNAL_KEYS) {
@@ -10569,7 +10576,7 @@ function getVisibleProperties(data, opts) {
   if (opts.includeAll) {
     const result2 = {};
     for (const [key, value2] of Object.entries(data)) {
-      if (!excluded.has(key)) {
+      if (!excluded.has(key) && !(opts.hideEmptyProperties && isEmpty(value2))) {
         result2[key] = value2;
       }
     }
@@ -10577,8 +10584,9 @@ function getVisibleProperties(data, opts) {
   }
   const result = {};
   for (const key of opts.includedProperties) {
-    if (!excluded.has(key) && data[key] !== void 0) {
-      result[key] = data[key];
+    const value2 = data[key];
+    if (!excluded.has(key) && value2 !== void 0 && !(opts.hideEmptyProperties && isEmpty(value2))) {
+      result[key] = value2;
     }
   }
   return result;
