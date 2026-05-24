@@ -131,6 +131,10 @@
         "type": "array",
         "description": "Properties to exclude from display"
       },
+      "hideEmptyProperties": {
+        "type": "boolean",
+        "description": "Omit properties whose value is null, undefined, empty string, or empty array. "
+      },
       "hidePropertiesView": {
         "type": "boolean",
         "description": "Hide the visual properties panel while still processing frontmatter"

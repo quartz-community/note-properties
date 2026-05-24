@@ -19,6 +19,7 @@ const defaultOptions: NotePropertiesOptions = {
   includedProperties: ["description", "tags", "aliases"],
   excludedProperties: [],
   hidePropertiesView: false,
+  hideEmptyProperties: false,
   delimiters: "---",
   language: "yaml",
 };
@@ -125,6 +126,13 @@ function coerceToBool(value: unknown): boolean | undefined {
   }
   return undefined;
 }
+function isEmpty(value: unknown): boolean {
+  if (value === null || value === undefined) return true;
+  if (typeof value === "string" && value.trim() === "") return true;
+  if (Array.isArray(value) && value.length === 0) return true;
+  return false;
+}
+
 function getVisibleProperties(
   data: Record<string, unknown>,
   opts: NotePropertiesOptions,
@@ -137,7 +145,7 @@ function getVisibleProperties(
   if (opts.includeAll) {
     const result: Record<string, unknown> = {};
     for (const [key, value] of Object.entries(data)) {
-      if (!excluded.has(key)) {
+      if (!excluded.has(key) && !(opts.hideEmptyProperties && isEmpty(value))) {
         result[key] = value;
       }
     }
@@ -146,8 +154,9 @@ function getVisibleProperties(
 
   const result: Record<string, unknown> = {};
   for (const key of opts.includedProperties) {
-    if (!excluded.has(key) && data[key] !== undefined) {
-      result[key] = data[key];
+    const value = data[key];
+    if (!excluded.has(key) && value !== undefined && !(opts.hideEmptyProperties && isEmpty(value))) {
+      result[key] = value;
     }
   }
   return result;
