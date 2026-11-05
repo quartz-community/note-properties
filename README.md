@@ -24,6 +24,8 @@ plugins:
         - tags
         - aliases
       excludedProperties: []
+      aliasProperties:
+        - permalink
       hidePropertiesView: false
       delimiters: "---"
       language: yaml
@@ -46,6 +48,7 @@ ExternalPlugin.NoteProperties({
   includedProperties: ["description", "tags", "aliases"],
   excludedProperties: [],
   hidePropertiesView: false,
+  aliasProperties: ["permalink"],
   delimiters: "---",
   language: "yaml",
 });
@@ -53,14 +56,15 @@ ExternalPlugin.NoteProperties({
 
 ## Configuration
 
-| Option               | Type       | Default                              | Description                                               |
-| -------------------- | ---------- | ------------------------------------ | --------------------------------------------------------- |
-| `includeAll`         | `boolean`  | `false`                              | Whether to include all frontmatter properties.            |
-| `includedProperties` | `string[]` | `["description", "tags", "aliases"]` | Properties to include when `includeAll` is `false`.       |
-| `excludedProperties` | `string[]` | `[]`                                 | Properties to exclude when `includeAll` is `true`.        |
-| `hidePropertiesView` | `boolean`  | `false`                              | Whether to hide the rendered properties view on the page. |
-| `delimiters`         | `string`   | `"---"`                              | The frontmatter delimiter style.                          |
-| `language`           | `string`   | `"yaml"`                             | The frontmatter language (`"yaml"` or `"toml"`).          |
+| Option               | Type       | Default                              | Description                                                                                     |
+| -------------------- | ---------- | ------------------------------------ | ----------------------------------------------------------------------------------------------- |
+| `includeAll`         | `boolean`  | `false`                              | Whether to include all frontmatter properties.                                                  |
+| `includedProperties` | `string[]` | `["description", "tags", "aliases"]` | Properties to include when `includeAll` is `false`.                                             |
+| `excludedProperties` | `string[]` | `[]`                                 | Properties to exclude when `includeAll` is `true`.                                              |
+| `hidePropertiesView` | `boolean`  | `false`                              | Whether to hide the rendered properties view on the page.                                       |
+| `aliasProperties`    | `string[]` | `["permalink"]`                      | Properties whose values are registered as alternate slugs. Values are normalized automatically. |
+| `delimiters`         | `string`   | `"---"`                              | The frontmatter delimiter style.                                                                |
+| `language`           | `string`   | `"yaml"`                             | The frontmatter language (`"yaml"` or `"toml"`).                                                |
 
 ## Documentation
 

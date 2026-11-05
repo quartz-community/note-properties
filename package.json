@@ -118,6 +118,9 @@
       ],
       "excludedProperties": [],
       "hidePropertiesView": false,
+      "aliasProperties": [
+        "permalink"
+      ],
       "delimiters": "---",
       "language": "yaml"
     },
@@ -137,6 +140,10 @@
       "hidePropertiesView": {
         "type": "boolean",
         "description": "Hide the visual properties panel while still processing frontmatter"
+      },
+      "aliasProperties": {
+        "type": "array",
+        "description": "Properties whose values are registered as alternate slugs"
       },
       "delimiters": {
         "type": "string",

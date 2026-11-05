@@ -30,6 +30,8 @@ export interface NotePropertiesOptions {
   excludedProperties: string[];
   /** Hide the visual properties panel while still processing frontmatter and resolving links. */
   hidePropertiesView: boolean;
+  /** Properties whose values are registered as alternate slugs. Values are normalized automatically. */
+  aliasProperties: string[];
   /** Frontmatter delimiters. Defaults to "---". */
   delimiters: string | [string, string];
   /** Frontmatter language. Defaults to "yaml". */
