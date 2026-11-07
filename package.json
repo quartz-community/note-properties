@@ -164,6 +164,21 @@
         "defaultPosition": "beforeBody",
         "defaultPriority": 15
       }
+    },
+    "capabilities": {
+      "provides": {
+        "data": [
+          "frontmatter",
+          "aliases",
+          "frontmatterLinks",
+          "noteProperties"
+        ]
+      },
+      "requires": {
+        "data": [
+          "slug"
+        ]
+      }
     }
   },
   "publishConfig": {
