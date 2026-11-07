@@ -32,8 +32,14 @@ export interface NotePropertiesOptions {
   hidePropertiesView: boolean;
   /** Properties whose values are registered as alternate slugs. Values are normalized automatically. */
   aliasProperties: string[];
-  /** Frontmatter delimiters. Defaults to "---". */
+  /**
+   * Frontmatter delimiters. Defaults to "---".
+   * @deprecated Quartz 5.1+ parses frontmatter in core: use `configuration.frontmatter.delimiters`.
+   */
   delimiters: string | [string, string];
-  /** Frontmatter language. Defaults to "yaml". */
+  /**
+   * Frontmatter language. Defaults to "yaml".
+   * @deprecated Quartz 5.1+ parses frontmatter in core: use `configuration.frontmatter.language`.
+   */
   language: "yaml" | "toml";
 }

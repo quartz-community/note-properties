@@ -154,6 +154,36 @@ function getVisibleProperties(
   return result;
 }
 
+/**
+ * Quartz 5.1+ parses frontmatter in core (built-in "Frontmatter" transformer, configured under
+ * `configuration.frontmatter`). On those versions this plugin only builds the properties view from
+ * `file.data.frontmatter`; on older versions it parses frontmatter itself, as before.
+ */
+export function coreParsesFrontmatter(ctx: BuildCtx): boolean {
+  const transformers = (ctx as { cfg?: { plugins?: { transformers?: { name?: string }[] } } }).cfg
+    ?.plugins?.transformers;
+  return Array.isArray(transformers) && transformers.some((t) => t?.name === "Frontmatter");
+}
+
+function notePropertiesData(
+  data: Record<string, unknown>,
+  opts: NotePropertiesOptions,
+): NonNullable<QuartzPluginData["noteProperties"]> {
+  // Read per-note overrides for properties view visibility and collapsed state
+  const showProperties = coerceToBool(
+    coalesceAliases(data, ["quartz-properties", "quartzProperties"]),
+  );
+  const collapseProperties = coerceToBool(
+    coalesceAliases(data, ["quartz-properties-collapse", "quartzPropertiesCollapse"]),
+  );
+  return {
+    properties: getVisibleProperties(data, opts),
+    hideView: opts.hidePropertiesView,
+    showProperties,
+    collapseProperties,
+  };
+}
+
 export const NoteProperties: QuartzTransformerPlugin<Partial<NotePropertiesOptions>> = (
   userOpts,
 ) => {
@@ -161,6 +191,19 @@ export const NoteProperties: QuartzTransformerPlugin<Partial<NotePropertiesOptio
   return {
     name: "NoteProperties",
     markdownPlugins(_ctx: BuildCtx) {
+      if (coreParsesFrontmatter(_ctx)) {
+        return [
+          () => {
+            return (_, file) => {
+              const data = file.data.frontmatter as Record<string, unknown> | undefined;
+              if (!data) return;
+              file.data.noteProperties = notePropertiesData(data, opts);
+            };
+          },
+        ];
+      }
+
+      // Legacy path (Quartz without built-in frontmatter): parse frontmatter here.
       const { allSlugs } = _ctx;
       return [
         [remarkFrontmatter, ["yaml", "toml"]],
@@ -232,20 +275,7 @@ export const NoteProperties: QuartzTransformerPlugin<Partial<NotePropertiesOptio
               file.data.frontmatterLinks = [...existingLinks, ...frontmatterLinks];
             }
 
-            // Read per-note overrides for properties view visibility and collapsed state
-            const showProperties = coerceToBool(
-              coalesceAliases(data, ["quartz-properties", "quartzProperties"]),
-            );
-            const collapseProperties = coerceToBool(
-              coalesceAliases(data, ["quartz-properties-collapse", "quartzPropertiesCollapse"]),
-            );
-            const visibleProps = getVisibleProperties(data, opts);
-            file.data.noteProperties = {
-              properties: visibleProps,
-              hideView: opts.hidePropertiesView,
-              showProperties,
-              collapseProperties,
-            };
+            file.data.noteProperties = notePropertiesData(data, opts);
 
             file.data.frontmatter = data as QuartzPluginData["frontmatter"];
           };
