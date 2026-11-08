@@ -1,5 +1,16 @@
 # Changelog
 
+## 1.1.0
+
+### Minor Changes
+
+- 163c5f6: Use Quartz's built-in frontmatter parsing when available (Quartz 5.1+): the plugin then only builds the properties view from `file.data.frontmatter`, and disabling it no longer breaks titles, tags, aliases or drafts. On older Quartz versions it parses frontmatter itself as before. The `delimiters` / `language` options are deprecated in favour of `configuration.frontmatter`.
+
+### Patch Changes
+
+- 7719c30: Tags in the properties view link to their tag page only when the site has one (the tag-page plugin or a hand-written page); otherwise they are shown as text instead of a link to a missing page. A tag with child tags links straight to `tags/<tag>/`.
+- d756c6b: `toml` 5 (prototype pollution and DoS advisories), matching Quartz core. Only used for TOML frontmatter on Quartz versions without built-in frontmatter.
+
 ## 1.0.0
 
 ### Major Changes
