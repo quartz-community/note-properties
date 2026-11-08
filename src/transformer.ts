@@ -14,6 +14,16 @@ import type { TransformOptions } from "@quartz-community/utils";
 import { slugifyWikilinkTarget } from "./util/path";
 import type { NotePropertiesOptions } from "./types";
 
+/**
+ * gray-matter adds custom engines to its defaults, which include a `javascript`/`js` engine that
+ * `eval`s the frontmatter (`---js`). Content is data, not code: refuse those languages.
+ */
+const refuseJavaScript = (): never => {
+  throw new Error(
+    "JavaScript frontmatter (---js / ---javascript) is not supported: Quartz does not execute code from content. Use YAML or TOML frontmatter.",
+  );
+};
+
 const defaultOptions: NotePropertiesOptions = {
   includeAll: false,
   includedProperties: ["description", "tags", "aliases"],
@@ -216,6 +226,8 @@ export const NoteProperties: QuartzTransformerPlugin<Partial<NotePropertiesOptio
               engines: {
                 yaml: (s) => yaml.load(s, { schema: yaml.JSON_SCHEMA }) as object,
                 toml: (s) => toml.parse(s) as object,
+                javascript: refuseJavaScript,
+                js: refuseJavaScript,
               },
             });
 

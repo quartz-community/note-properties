@@ -53,4 +53,22 @@ describe("built-in frontmatter detection", () => {
     const plugins = NoteProperties({}).markdownPlugins!(legacyCtx);
     expect(plugins).toHaveLength(2);
   });
+
+  it("refuses JavaScript frontmatter instead of executing it (legacy path)", () => {
+    const g = globalThis as { __notePropertiesRan?: boolean };
+    delete g.__notePropertiesRan;
+    const plugins = NoteProperties({}).markdownPlugins!({ allSlugs: [] } as unknown as BuildCtx);
+    const parse = (plugins[1] as () => (tree: unknown, file: VFile) => void)();
+    for (const lang of ["js", "javascript"]) {
+      const file = new VFile({
+        value: Buffer.from(
+          `---${lang}\n{ title: "x", ran: (globalThis.__notePropertiesRan = true) }\n---\nbody\n`,
+        ),
+        path: "note.md",
+      });
+      file.data = {};
+      expect(() => parse(null, file)).toThrow(/JavaScript frontmatter/);
+    }
+    expect(g.__notePropertiesRan).toBeUndefined();
+  });
 });
