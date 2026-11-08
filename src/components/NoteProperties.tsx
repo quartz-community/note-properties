@@ -18,7 +18,30 @@ const WIKILINK_RE = /\[\[([^\]|]+)(?:\|([^\]]+))?\]\]/g;
 const MDLINK_RE = /\[([^\]]*)\]\(([^)]+)\)/g;
 const URL_RE = /https?:\/\/[^\s<>]+/g;
 
-type RenderCtx = { slug: string; resolvedLinks: Record<string, string> };
+type RenderCtx = {
+  slug: string;
+  resolvedLinks: Record<string, string>;
+  /** The page listing a tag, if the site has one (see `tagPageFor`). */
+  tagPage: (tag: string) => string | undefined;
+};
+
+/** Slugs of every page, generated tag pages included, cached per build's page list. */
+const slugsOf = new WeakMap<object, Set<string>>();
+
+/**
+ * The page listing `tag`, if the site has one: `tags/<tag>`, or `tags/<tag>/index` for a tag with
+ * child tags. Without the tag-page plugin (or a hand-written page) there is none, and the tag is
+ * shown without a link rather than as a link to a page that does not exist.
+ */
+export function tagPageFor(tag: string, allFiles: { slug?: unknown }[]): string | undefined {
+  let slugs = slugsOf.get(allFiles);
+  if (!slugs) {
+    slugs = new Set(allFiles.flatMap((file) => (typeof file.slug === "string" ? [file.slug] : [])));
+    slugsOf.set(allFiles, slugs);
+  }
+  const found = slugs;
+  return [`tags/${tag}`, `tags/${tag}/index`].find((slug) => found.has(slug));
+}
 
 function lookupHref(ctx: RenderCtx, slugifiedTarget: string): string {
   return ctx.resolvedLinks[slugifiedTarget] ?? resolveRelative(ctx.slug, slugifiedTarget);
@@ -158,13 +181,17 @@ function renderValue(value: unknown, ctx: RenderCtx): preact.JSX.Element | strin
 
 function renderTagList(tags: string[], ctx: RenderCtx): preact.JSX.Element {
   const items = tags.map((tag, idx) => {
-    const href = resolveRelative(ctx.slug, `tags/${tag}`);
+    const page = ctx.tagPage(tag);
     return (
       <>
         {idx > 0 && <span class="note-properties-separator">, </span>}
-        <a href={href} class="internal internal-link tag-link">
-          {tag}
-        </a>
+        {page ? (
+          <a href={resolveRelative(ctx.slug, page)} class="internal internal-link tag-link">
+            {tag}
+          </a>
+        ) : (
+          <span class="tag-link">{tag}</span>
+        )}
       </>
     );
   });
@@ -200,6 +227,7 @@ export default ((opts?: NotePropertiesComponentOptions) => {
     const ctx: RenderCtx = {
       slug: (props.fileData?.slug as string) ?? "",
       resolvedLinks: noteProps.resolvedLinks ?? {},
+      tagPage: (tag) => tagPageFor(tag, props.allFiles ?? []),
     };
 
     // Per-note collapse override takes precedence over component option
