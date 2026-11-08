@@ -29,6 +29,8 @@ plugins:
         - tags
         - aliases
       excludedProperties: []
+      aliasProperties:
+        - permalink
       hidePropertiesView: false
 
   # Component (displays properties in the page layout)
@@ -49,6 +51,7 @@ ExternalPlugin.NoteProperties({
   includedProperties: ["description", "tags", "aliases"],
   excludedProperties: [],
   hidePropertiesView: false,
+  aliasProperties: ["permalink"],
 });
 ```
 
@@ -60,6 +63,7 @@ ExternalPlugin.NoteProperties({
 | `includedProperties` | `string[]` | `["description", "tags", "aliases"]` | Properties to include when `includeAll` is `false`.                                            |
 | `excludedProperties` | `string[]` | `[]`                                 | Properties to exclude when `includeAll` is `true`.                                             |
 | `hidePropertiesView` | `boolean`  | `false`                              | Whether to hide the rendered properties view on the page.                                      |
+| `aliasProperties`    | `string[]` | `["permalink"]`                      | Properties whose values are registered as alternate slugs. Values are normalized automatically.|
 | `delimiters`         | `string`   | `"---"`                              | Quartz < 5.1 only: frontmatter delimiters. On 5.1+ set `configuration.frontmatter.delimiters`. |
 | `language`           | `string`   | `"yaml"`                             | Quartz < 5.1 only: `"yaml"` or `"toml"`. On 5.1+ set `configuration.frontmatter.language`.     |
 

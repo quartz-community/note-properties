@@ -30,6 +30,8 @@ export interface NotePropertiesOptions {
   excludedProperties: string[];
   /** Hide the visual properties panel while still processing frontmatter and resolving links. */
   hidePropertiesView: boolean;
+  /** Properties whose values are registered as alternate slugs. Values are normalized automatically. */
+  aliasProperties: string[];
   /**
    * Frontmatter delimiters. Defaults to "---".
    * @deprecated Quartz 5.1+ parses frontmatter in core: use `configuration.frontmatter.delimiters`.

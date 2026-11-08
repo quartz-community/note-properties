@@ -29,6 +29,7 @@ const defaultOptions: NotePropertiesOptions = {
   includedProperties: ["description", "tags", "aliases"],
   excludedProperties: [],
   hidePropertiesView: false,
+  aliasProperties: ["permalink"],
   delimiters: "---",
   language: "yaml",
 };
@@ -239,19 +240,20 @@ export const NoteProperties: QuartzTransformerPlugin<Partial<NotePropertiesOptio
             const tags = coerceToArray(coalesceAliases(data, ["tags", "tag"]));
             if (tags) data.tags = [...new Set(tags.map((tag: string) => slugTag(tag)))];
 
-            const aliases = coerceToArray(coalesceAliases(data, ["aliases", "alias"]));
-            if (aliases) {
-              data.aliases = aliases;
-              file.data.aliases = getAliasSlugs(aliases);
-              allSlugs.push(...file.data.aliases);
-            }
+            const aliases = coerceToArray(coalesceAliases(data, ["aliases", "alias"])) ?? [];
+            const propertyAliases = opts.aliasProperties.flatMap((property) => {
+              const value = data[property];
+              const isScalar = typeof value === "string" || typeof value === "number";
+              if (!isScalar && !Array.isArray(value)) return [];
+              return coerceToArray(value) ?? [];
+            });
+            const allAliases = [...aliases, ...propertyAliases];
 
-            if (data.permalink != null && data.permalink.toString() !== "") {
-              data.permalink = data.permalink.toString() as FullSlug;
-              const fileAliases = (file.data.aliases as FullSlug[]) ?? [];
-              fileAliases.push(data.permalink);
-              file.data.aliases = fileAliases;
-              allSlugs.push(data.permalink);
+            if (aliases.length > 0) data.aliases = aliases;
+
+            if (allAliases.length > 0) {
+              file.data.aliases = [...new Set(getAliasSlugs(allAliases))];
+              allSlugs.push(...file.data.aliases);
             }
 
             const cssclasses = coerceToArray(coalesceAliases(data, ["cssclasses", "cssclass"]));
