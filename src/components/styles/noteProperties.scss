@@ -112,9 +112,14 @@
 
   .note-properties-tags {
     display: inline-flex;
+    flex-wrap: wrap;
 
     .tag-link {
       display: inline-block;
+      white-space: nowrap;
+      overflow-wrap: normal;
+      word-break: normal;
+
       padding: 0.1rem 0.4rem;
       border-radius: 3px;
       background: var(--highlight);
